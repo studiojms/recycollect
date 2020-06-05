@@ -10,13 +10,21 @@ class PointsController {
       .split(',')
       .map((item) => Number(item.trim()));
 
-    const points = await knex('points')
-      .join('point_items', 'points.id', '=', 'point_items.point_id')
-      .whereIn('point_items.item_id', parsedItems)
-      .where('city', String(city))
-      .where('state', String(state))
-      .distinct()
-      .select('points.*');
+    let baseQuery = knex('points').join('point_items', 'points.id', '=', 'point_items.point_id');
+
+    if (city) {
+      baseQuery = baseQuery.where('city', String(city));
+    }
+
+    if (state) {
+      baseQuery = baseQuery.where('state', String(state));
+    }
+
+    if (items) {
+      baseQuery = baseQuery.whereIn('point_items.item_id', parsedItems);
+    }
+
+    const points = await baseQuery.distinct().select('points.*');
 
     return res.json(points);
   }

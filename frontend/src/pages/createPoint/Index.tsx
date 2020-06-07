@@ -9,6 +9,7 @@ import './styles.css';
 import logo from '../../assets/logo.svg';
 import api from '../../services/api';
 import ibgeApi from '../../services/ibgeApi';
+import Dropzone from '../../components/dropzone/Index';
 
 interface Item {
   id: number;
@@ -41,6 +42,7 @@ function CreatePoint(): JSX.Element {
   const [initialMapPosition, setInitialMapPosition] = useState<[number, number]>([0, 0]);
 
   const [selectedState, setSelectedState] = useState<string>('0');
+  const [selectedFile, setSelectedFile] = useState<File>();
   const [selectedCity, setSelectedCity] = useState<string>('0');
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const [selectedMapPosition, setSelectedMapPosition] = useState<[number, number]>([0, 0]);
@@ -129,16 +131,20 @@ function CreatePoint(): JSX.Element {
     const [latitude, longitude] = selectedMapPosition;
     const items = selectedItems;
 
-    const data = {
-      name,
-      email,
-      whatsapp,
-      state,
-      city,
-      latitude,
-      longitude,
-      items,
-    };
+    const data = new FormData();
+
+    data.append('name', name);
+    data.append('email', email);
+    data.append('whatsapp', whatsapp);
+    data.append('state', state);
+    data.append('city', city);
+    data.append('latitude', String(latitude));
+    data.append('longitude', String(longitude));
+    data.append('items', items.join(','));
+
+    if (selectedFile) {
+      data.append('image', selectedFile);
+    }
 
     try {
       await api.post('points', data);
@@ -162,6 +168,9 @@ function CreatePoint(): JSX.Element {
       </header>
       <form onSubmit={handleSubmit}>
         <h1>Collection Point Register</h1>
+
+        <Dropzone text="Point image" onFileUpload={setSelectedFile} />
+
         <fieldset>
           <legend>
             <h2>Data</h2>

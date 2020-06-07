@@ -1,5 +1,14 @@
-import React from 'react';
-import { View, StyleSheet, Image, Text, ImageBackground } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  Image,
+  Text,
+  ImageBackground,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import { Feather as Icon } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -9,28 +18,48 @@ import background from '../../assets/home-background.png';
 
 function Home() {
   const navigation = useNavigation();
+  const [state, setState] = useState<string>('');
+  const [city, setCity] = useState<string>('');
 
   function handleNavigateToPoints() {
-    navigation.navigate('Points');
+    navigation.navigate('Points', {
+      state,
+      city,
+    });
   }
 
   return (
-    <ImageBackground source={background} style={styles.container} imageStyle={{ width: 274, height: 368 }}>
-      <View style={styles.main}>
-        <Image source={logo} />
-        <Text style={styles.title}>Your marketplace of waste collecting</Text>
-        <Text style={styles.description}>We help people find collection points efficiently</Text>
-      </View>
-
-      <View style={styles.footer}>
-        <RectButton style={styles.button} onPress={handleNavigateToPoints}>
-          <View style={styles.buttonIcon}>
-            <Icon name="arrow-right" color="#fff" size={24} />
+    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ImageBackground source={background} style={styles.container} imageStyle={{ width: 274, height: 368 }}>
+        <View style={styles.main}>
+          <Image source={logo} />
+          <View>
+            <Text style={styles.title}>Your marketplace of waste collecting</Text>
+            <Text style={styles.description}>We help people find collection points efficiently</Text>
           </View>
-          <Text style={styles.buttonText}>Sign in</Text>
-        </RectButton>
-      </View>
-    </ImageBackground>
+        </View>
+
+        <View style={styles.footer}>
+          <TextInput
+            style={styles.input}
+            placeholder="State"
+            autoCapitalize="characters"
+            maxLength={2}
+            autoCorrect={false}
+            value={state}
+            onChangeText={setState}
+          />
+          <TextInput style={styles.input} placeholder="City" autoCorrect={false} value={city} onChangeText={setCity} />
+
+          <RectButton style={styles.button} onPress={handleNavigateToPoints}>
+            <View style={styles.buttonIcon}>
+              <Icon name="arrow-right" color="#fff" size={24} />
+            </View>
+            <Text style={styles.buttonText}>Sign in</Text>
+          </RectButton>
+        </View>
+      </ImageBackground>
+    </KeyboardAvoidingView>
   );
 }
 
